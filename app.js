@@ -10,6 +10,21 @@ const app = express();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
 
+var fs = require( 'fs' );
+var app = require('express')();
+var https = require('https');
+var server = https.createServer({
+    key: fs.readFileSync('./test_key.key'),
+    cert: fs.readFileSync('./test_cert.crt'),
+    ca: fs.readFileSync('./test_ca.crt'),
+    requestCert: false,
+    rejectUnauthorized: false
+},app);
+server.listen(port);
+
+var io = require('socket.io').listen(server);
+
+
 //load values model
 require('./models/Value');
 const Values = mongoose.model('values');
@@ -33,7 +48,7 @@ function predict(x, y, z){
 }
 
 // Imports the Google Cloud client library
-io.on('connection', function(socket){
+io.sockets.on('connection',function (socket) {
   var values = io.emit("lastvalues", values);
  
 
