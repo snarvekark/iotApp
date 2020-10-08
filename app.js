@@ -89,7 +89,7 @@ app.use(methodOverride('_method'));
 // Map global promise - get rid of warning
 mongoose.Promise = global.Promise;
 //connect to mongoose
-const uri = "mongodb+srv://assignment1:5JuACpmKysNwVGae@cluster0-1fa34.gcp.mongodb.net/IoT-assignment1";
+const uri = "mongodb+srv://iotUser1:GweMPb6FHdYf9TFr@cluster0.lcqe6.gcp.mongodb.net/iotUser1?retryWrites=true&w=majority";
 mongoose.connect(uri, {
   useNewUrlParser: true
 })
