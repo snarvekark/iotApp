@@ -49,7 +49,7 @@ io.on('connection', function(socket){
       new Values(newValue).save();
 
       // TEMPERATURE websocket displays new value
-      if(payload[0] == "device1" || payload[0] == "riot_device1")
+      if(payload[0] == "my-device" || payload[0] == "riot_device1")
         io.emit("temperature", payload[1]+";"+payload[2]);
       // HUMIDITY websocket displays new value
       if(payload[0] == "device2" || payload[0] == "riot_device2")
