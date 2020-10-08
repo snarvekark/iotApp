@@ -49,17 +49,7 @@ io.on('connection', function(socket){
       new Values(newValue).save();
 
       // TEMPERATURE websocket displays new value
-      if(payload[0] == "my-device" || payload[0] == "riot_device1")
-        io.emit("temperature", payload[1]+";"+payload[2]);
-      // HUMIDITY websocket displays new value
-      if(payload[0] == "device2" || payload[0] == "riot_device2")
-        io.emit("humidity", payload[1]+";"+payload[2]);
-      // WIND DIRECTION websocket displays new value
-      if(payload[0] == "device3" || payload[0] == "riot_device3")
-        io.emit("wind", payload[1]+";"+payload[2]);
-      // RAIN HEIGHT websocket displays new value
-      if(payload[0] == "device4" || payload[0] == "riot_device4")
-        io.emit("rain", payload[1]+";"+payload[2]);
+      io.emit("temperature", payload[1]+";"+payload[2]);
 
       // "Ack" (acknowledge receipt of) the message
       message.ack();
