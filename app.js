@@ -23,7 +23,7 @@ const {eq} = require('./helpers/hbs');
 /********************************************************************************************************/
 // Imports the Google Cloud client library
 io.on('connection', function(socket){
-  const subscriptionName = 'projects/awesome-sylph-271611/subscriptions/my-subscription1';
+  const subscriptionName = 'projects/assignment1-291402/subscriptions/my-subscription';
 
   // Creates a client; cache this for further use
   const pubSubClient = new PubSub();
