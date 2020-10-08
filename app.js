@@ -1,26 +1,26 @@
-// const express = require('express');
-// const path = require('path');                       //for path navigation
-// const bodyParser = require('body-parser');          //to access at req.value
-// const methodOverride = require('method-override');  //needs for edit and delete
-// const {PubSub} = require('@google-cloud/pubsub');   //google cloud pub/sub module
-// const mongoose = require('mongoose');               //database
-// const exphbs = require('express-handlebars');       //front-end
+const express = require('express');
+const path = require('path');                       //for path navigation
+const bodyParser = require('body-parser');          //to access at req.value
+const methodOverride = require('method-override');  //needs for edit and delete
+const {PubSub} = require('@google-cloud/pubsub');   //google cloud pub/sub module
+const mongoose = require('mongoose');               //database
+const exphbs = require('express-handlebars');       //front-end
 
-// const app = express();
-// const http = require('http').Server(app);
-// const io = require('socket.io')(http);
+const app = express();
+const http = require('http').Server(app);
+const io = require('socket.io')(http);
 
-// //load values model
-// require('./models/Value');
-// const Values = mongoose.model('values');
-// require('./models/Accel_cloud');
-// const AccelCloud = mongoose.model('accel_cloud');
-// require('./models/Accel_edge');
-// const AccelEdge = mongoose.model('accel_edge');
+//load values model
+require('./models/Value');
+const Values = mongoose.model('values');
+require('./models/Accel_cloud');
+const AccelCloud = mongoose.model('accel_cloud');
+require('./models/Accel_edge');
+const AccelEdge = mongoose.model('accel_edge');
 
-// //handlebars helpers
-// const {stripTags} = require('./helpers/hbs');
-// const {eq} = require('./helpers/hbs');
+//handlebars helpers
+const {stripTags} = require('./helpers/hbs');
+const {eq} = require('./helpers/hbs');
 
 // /********************************************************************************************************/
 // /*                                    WebSocket and MQTT connection                                     */
