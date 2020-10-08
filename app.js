@@ -34,11 +34,8 @@ function predict(x, y, z){
 
 // Imports the Google Cloud client library
 io.on('connection', function(socket){
-  var values = Values.find(
-    { date: { $gt: parseInt(Date.now()/1000) - 3600 } }
-  ).sort({date:-1}).then(values => {
-    io.emit("lastvalues", values);
-  });
+  var values = io.emit("lastvalues", values);
+ 
 
   const subscriptionName1 = 'projects/assignment1-291402/subscriptions/my-subscription';
   
