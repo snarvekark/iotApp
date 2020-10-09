@@ -7,8 +7,8 @@ const mongoose = require('mongoose');               //database
 const exphbs = require('express-handlebars');       //front-end
 
 const app = express();
-const http = require('http').Server(app);
-const io = require('socket.io')(http);
+const https = require('https').Server(app);
+const io = require('socket.io')(https);
 
 //load values model
 require('./models/Value');
