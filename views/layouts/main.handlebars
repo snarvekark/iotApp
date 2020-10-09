@@ -35,7 +35,7 @@
       $(function () {
         //var socket = window.io.connect('http://localhost:5000', {transports:['websocket']});
         //var socket = io.connect('http://iot-assignment1.herokuapp.com', {transports:['websocket']});
-        var socket = io.connect('https://agile-castle-22024.herokuapp.com/', {transports:['websocket']}, {secure: true});
+        var socket = io.connect('https://agile-castle-22024.herokuapp.com/', {transports:['websocket']});
         /// Devices Management
         socket.on('temperature', function(data){
           var payload = data.split(";");

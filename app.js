@@ -10,21 +10,6 @@ const app = express();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
 
-var fs = require( 'fs' );
-var app = require('express')();
-var https = require('https');
-var server = https.createServer({
-    key: fs.readFileSync('./test_key.key'),
-    cert: fs.readFileSync('./test_cert.crt'),
-    ca: fs.readFileSync('./test_ca.crt'),
-    requestCert: false,
-    rejectUnauthorized: false
-},app);
-server.listen(port);
-
-var io = require('socket.io').listen(server);
-
-
 //load values model
 require('./models/Value');
 const Values = mongoose.model('values');
@@ -37,6 +22,9 @@ const AccelEdge = mongoose.model('accel_edge');
 const {stripTags} = require('./helpers/hbs');
 const {eq} = require('./helpers/hbs');
 
+
+
+
 /********************************************************************************************************/
 /*                                    WebSocket and MQTT connection                                     */
 /********************************************************************************************************/
@@ -47,8 +35,36 @@ function predict(x, y, z){
   else return 0;
 }
 
+
+//Authenticate Default Connection *****************************
+// Imports the Google Cloud client library.
+const {Storage} = require('@google-cloud/storage');
+
+// Instantiates a client. If you don't specify credentials when constructing
+// the client, the client library will look for credentials in the
+// environment.
+const storage = new Storage();
+// Makes an authenticated API request.
+async function listBuckets() {
+  try {
+    const results = await storage.getBuckets();
+
+    const [buckets] = results;
+
+    console.log('Buckets:');
+    buckets.forEach((bucket) => {
+      console.log(bucket.name);
+    });
+  } catch (err) {
+    console.error('ERROR:', err);
+  }
+}
+listBuckets();
+
+//************** End of Authentication */
+
 // Imports the Google Cloud client library
-io.sockets.on('connection',function (socket) {
+io.on('connection', function(socket){
   var values = io.emit("lastvalues", values);
  
 
@@ -63,64 +79,23 @@ io.sockets.on('connection',function (socket) {
    
     // Create an event handler to handle messages
 
-    /********************************************* ENVIRONMENTAL STATIONS *********************************************/
     const messageHandler1 = message => {
       console.log(`Received message ${message.id}:`);
-      console.log('\tData:' + message.data);
-      console.log(`\tAttributes: ${message.attributes}`);
-      var payload = JSON.parse(message.data);
-
+      console.log(`\tData: ${message.data}`);
+      //console.log(`\tAttributes: ${message.attributes}`);
+      // Splitting the payload received
+      var payload = `${message.data}`.split(";");
+      
+      // Insert the new value in the Database
       const newValue = {
-        deviceId: payload.deviceId,
-        temperature: payload.temperature,
-        date: payload.date
+        deviceId: payload[0].toString(),
+        value: payload[1].toString(),
+        date: payload[2].toString()
       };
       new Values(newValue).save();
 
       // TEMPERATURE
-      io.emit("temperature", (payload.deviceId + ";" + payload.temperature + ";" + payload.date).toString());
-      // HUMIDITY
-      message.ack();
-    };
-
-    /********************************************* USER ACTIVITY RECOGNITION *********************************************/
-    const messageHandler2 = message => {
-      console.log(`Received message ${message.id}:`);
-      console.log('\tData:' + message.data);
-      console.log(`\tAttributes: ${message.attributes}`);
-      var payload = JSON.parse(message.data);
-      
-      /********************************* CLOUD BASED ***************************************/
-      if(payload.flag == 0){
-        var status = predict(payload.x, payload.y, payload.z);
-
-        const newValue = {
-          deviceId: payload.user_id,
-          x: payload.x,
-          y: payload.y,
-          z: payload.z,
-          magnitude: (Math.hypot(payload.x, payload.y, payload.z)).toFixed(3),
-          date: parseInt(Date.now()/1000),
-          status: status
-        };
-        new AccelCloud(newValue).save();
-
-        io.emit('status_cloud', JSON.stringify(newValue));
-      }
-
-      /*********************************** EDGE BASED ***************************************/
-      else{
-        const newValue = {
-          deviceId: payload.user_id,
-          date: parseInt(Date.now()/1000),
-          status: payload.activity
-        };
-        new AccelEdge(newValue).save();
-
-        io.emit('status_edge', JSON.stringify(newValue));
-      }
-
-      // "Ack" (acknowledge receipt of) the message
+      io.emit("temperature", payload[1]+";"+payload[2]);
       message.ack();
     };
 
@@ -157,35 +132,14 @@ mongoose.connect(uri, {
   })
   .catch(err => console.log(err));
 
-// GET Home page
+// GET route for index page
 app.get('/', function (req, res) {
-    res.render('index');
-});
-
-// GET route for environmental dashboard
-app.get('/environmentalstations', function (req, res) {
+  // Query to retrieve the last hour values
   Values.find(
     { date: { $gt: parseInt(Date.now()/1000) - 3600 } }
-  ).sort({date:-1}).then(values =>{
-    res.render('envstat', {values:values});
+  ).then(values =>{
+    res.render('index', {values:values});
   })
-});
-
-// GET route for user activity recognition dashboard
-app.get('/useractivityrecognition', function (req, res) {
-
-  // CLOUD BASED
-  AccelCloud.find(
-    { date: { $gt: parseInt(Date.now()/1000) - 3600 } }
-  ).sort({date:-1}).then(values_cloud => {
-
-    // EDGE BASED
-    AccelEdge.find(
-      { date: { $gt: parseInt(Date.now()/1000) - 3600 } }
-    ).sort({date:-1}).then(values_edge => {
-      res.render('uar', {values_cloud:values_cloud, values_edge:values_edge});
-    });
-  });
 });
 
 // Starting Server
