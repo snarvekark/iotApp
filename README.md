@@ -1,3 +1,3 @@
 # iotApp
 
-### Google Cloud IOT Pipleline setup project
+### Google Cloud IOT Pipeline setup project
